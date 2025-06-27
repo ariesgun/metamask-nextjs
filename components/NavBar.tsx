@@ -58,7 +58,7 @@ export const NavBar = () => {
   };
 
   return (
-    <nav className="flex items-center justify-between max-w-screen-xl px-6 mx-auto py-7 rounded-xl">
+    <nav className="flex items-center justify-between max-w-screen-xl px-6 mx-auto py-7 rounded-xl w-full">
       <Link href="/" className="flex gap-1 px-6">
         <span className="hidden text-2xl font-bold sm:block">
           <span className="text-gray-900">Template</span>
