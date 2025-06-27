@@ -1,46 +1,32 @@
 "use client";
 
 import Link from "next/link";
-
 import WalletIcon from "../public/icons/WalletIcon";
-
 import { Button } from "@/components/ui/button";
-
-import { useSDK, MetaMaskProvider } from "@metamask/sdk-react";
 import { formatAddress } from "../lib/utils";
 import {
   Popover,
   PopoverTrigger,
   PopoverContent,
 } from "@/components/ui/popover";
+import { useAccount, useConnect, useDisconnect } from 'wagmi';
 
 export const ConnectWalletButton = () => {
-  const { sdk, connected, connecting, account } = useSDK();
-
-  const connect = async () => {
-    try {
-      await sdk?.connect();
-    } catch (err) {
-      console.warn(`No accounts found`, err);
-    }
-  };
-
-  const disconnect = () => {
-    if (sdk) {
-      sdk.terminate();
-    }
-  };
+  // const { sdk, connected, connecting, account } = useSDK();
+  const { isConnected, address, isConnecting } = useAccount();
+  const { connectors, connect } = useConnect()
+  const { disconnect } = useDisconnect();
 
   return (
     <div className="relative">
-      {connected ? (
+      {isConnected ? (
         <Popover>
           <PopoverTrigger asChild>
-            <Button>{formatAddress(account)}</Button>
+            <Button>{formatAddress(address)}</Button>
           </PopoverTrigger>
           <PopoverContent className="mt-2 w-44 bg-gray-100 border rounded-md shadow-lg right-0 z-10 top-10">
             <button
-              onClick={disconnect}
+              onClick={() => disconnect()}
               className="block w-full pl-2 pr-4 py-2 text-left text-[#F05252] hover:bg-gray-200"
             >
               Disconnect
@@ -48,9 +34,11 @@ export const ConnectWalletButton = () => {
           </PopoverContent>
         </Popover>
       ) : (
-        <Button disabled={connecting} onClick={connect}>
-          <WalletIcon className="mr-2 h-4 w-4" /> Connect Wallet
-        </Button>
+        connectors.map((connector) => (
+          <Button disabled={isConnecting} key={connector.uid} onClick={() => connect({ connector })}>
+            <WalletIcon className="mr-2 h-4 w-4" /> Connect Wallet
+          </Button>
+        ))
       )}
     </div>
   );
@@ -77,9 +65,7 @@ export const NavBar = () => {
         </span>
       </Link>
       <div className="flex gap-4 px-6">
-        <MetaMaskProvider debug={false} sdkOptions={sdkOptions}>
-          <ConnectWalletButton />
-        </MetaMaskProvider>
+        <ConnectWalletButton />
       </div>
     </nav>
   );
