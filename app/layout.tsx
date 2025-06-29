@@ -18,7 +18,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className="bg-[#F4F4F5] lg:max-w-screen-xl mx-auto">
+      <body className="lg:max-w-screen-lg mx-auto">
         <AppProviders children={children} />
       </body>
     </html>
