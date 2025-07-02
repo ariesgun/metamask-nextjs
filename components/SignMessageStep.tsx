@@ -1,28 +1,26 @@
-import { useAccount, useConnect, useSignMessage } from "wagmi";
+import { useAccount, useSignMessage } from "wagmi";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
-import { formatAddress } from "@/lib/utils";
 import React, { useEffect, useState } from "react";
 import { Input } from "./ui/input";
 import { verifyMessage } from "viem";
 import { supabase } from "@/lib/supabaseClient";
 
 interface SignMessageStepProps {
-  onTelegramChanged: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  onTelegramChanged: (e: string) => void;
   onSigned: (val: boolean) => void;
 }
 
 export default function SignMessageStep({ onTelegramChanged, onSigned }: SignMessageStepProps) {
 
   const [signed, setSigned] = useState<boolean>(false);
-  const [error, setError] = useState<string | null>(null)
-  const { signMessageAsync, isPending } = useSignMessage()
+  const { signMessageAsync } = useSignMessage()
   const [username, setUsername] = useState<string | null>(null);
   const { address } = useAccount();
 
   const retrieveEOA = async () => {
     console.log("Telegram user Id", username)
-    const { data, error } = await supabase.from('user_wallets')
+    const { data } = await supabase.from('user_wallets')
       .select('*')
       .eq('eoa_wallet_address', address)
       .eq('status', "SIGNED")
@@ -30,16 +28,16 @@ export default function SignMessageStep({ onTelegramChanged, onSigned }: SignMes
     console.log("Data", data);
     if (data && data?.length > 0) {
       setSigned(data[0].status === "SIGNED")
-      setUsername(data[0].telegram_user_id)
-      onTelegramChanged(data[0].telegram_user_id)
+      setUsername(data[0].telegram_user_name)
+      onTelegramChanged(data[0].telegram_user_name)
     }
   }
 
   const retrieveStatus = async () => {
     console.log("Telegram user Id", username)
-    const { data, error } = await supabase.from('user_wallets')
+    const { data } = await supabase.from('user_wallets')
       .select('*')
-      .eq('telegram_user_id', username)
+      .eq('telegram_user_name', username)
 
     console.log("Data", data);
     if (data && data?.length > 0) {
@@ -54,17 +52,13 @@ export default function SignMessageStep({ onTelegramChanged, onSigned }: SignMes
 
   const updateEOA = async () => {
     // Update EOA status has been signed
-    const { data: updated, error: updateError } = await supabase
+    await supabase
       .from('user_wallets')
       .update({ eoa_wallet_address: address, status: 'SIGNED' })
-      .eq('telegram_user_id', username)
-
-    console.log("Updated")
+      .eq('telegram_user_name', username)
   }
 
   const handleSignAgreement = async () => {
-    setError(null)
-
     try {
       const message = `
   By signing this message, I confirm that my Telegram username is ${username}. 
@@ -76,7 +70,7 @@ export default function SignMessageStep({ onTelegramChanged, onSigned }: SignMes
       const sig = await signMessageAsync({ message })
 
       if (!address) {
-        setError("Wallet address is not available.");
+        console.error("Wallet address is not available.");
         return;
       }
       const isValid = await verifyMessage({
@@ -93,7 +87,7 @@ export default function SignMessageStep({ onTelegramChanged, onSigned }: SignMes
       }
 
     } catch (err: any) {
-      setError(err?.message || "Signing failed")
+      console.error("Signing failed", err)
     }
   }
 

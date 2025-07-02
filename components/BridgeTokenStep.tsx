@@ -1,23 +1,23 @@
-import { useAccount, useConfig, useConnect, useSignMessage, useWalletClient } from "wagmi";
+import { useConfig, useWalletClient } from "wagmi";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
-import { formatAddress } from "@/lib/utils";
 import { useState } from "react";
 import { Input } from "./ui/input";
 import { CHAIN_IDS_TO_MESSAGE_TRANSMITTER, CHAIN_IDS_TO_TOKEN_MESSENGER, CHAIN_IDS_TO_USDC_ADDRESSES } from "@/lib/constants";
 import { encodeApproveERC20, encodeCCTPDepositForBurn, encodeCCTPMint, retrieveAttestation } from "@/lib/cctp";
-import { sendCalls, sendTransaction, waitForTransactionReceipt, switchChain } from "@wagmi/core"
-import { lineaSepolia, baseSepolia, mainnet, sepolia } from "viem/chains";
+import { sendTransaction, waitForTransactionReceipt } from "@wagmi/core"
+import { lineaSepolia, baseSepolia } from "viem/chains";
 import { Hex } from "viem";
 import { useEffect } from "react";
 import { supabase } from "@/lib/supabaseClient";
 
 interface BridgeTokenStepProps {
-  telegramUserId: string;
+  telegramUserName: string;
   signed: boolean;
+  onDeposit: (val: boolean) => void;
 }
 
-export default function BridgeTokenStep({ telegramUserId, signed }: BridgeTokenStepProps) {
+export default function BridgeTokenStep({ telegramUserName, signed, onDeposit }: BridgeTokenStepProps) {
 
   const { data: walletClient } = useWalletClient();
   const [address, setAddress] = useState<string>("");
@@ -26,11 +26,10 @@ export default function BridgeTokenStep({ telegramUserId, signed }: BridgeTokenS
   const config = useConfig()
 
   useEffect(() => {
-    const retrieveWalletAddress = async() => {
-      console.log("Telegram user Id...", telegramUserId)
-      const { data, error} = await supabase.from('user_wallets')
+    const retrieveWalletAddress = async () => {
+      const { data } = await supabase.from('user_wallets')
         .select('*')
-        .eq('telegram_user_id', telegramUserId)
+        .eq('telegram_user_name', telegramUserName)
         .eq('status', "SIGNED")
 
       console.log("Data", data);
@@ -39,10 +38,10 @@ export default function BridgeTokenStep({ telegramUserId, signed }: BridgeTokenS
       }
     }
 
-    if (telegramUserId === "") return
+    if (telegramUserName === "") return
 
     retrieveWalletAddress();
-  }, [telegramUserId, signed]);
+  }, [telegramUserName, signed]);
 
   const checkTxCompleted = async (txHash: `0x${string}`) => {
     try {
@@ -82,7 +81,7 @@ export default function BridgeTokenStep({ telegramUserId, signed }: BridgeTokenS
     const approveTx = await sendTransaction(config, {
       to: usdc,
       data: approveUSDCCallData
-    });    
+    });
     console.log("approveTx:", approveTx);
 
     await checkTxCompleted(approveTx)
@@ -113,9 +112,10 @@ export default function BridgeTokenStep({ telegramUserId, signed }: BridgeTokenS
       to: trasmitterAddr,
       data: redeemCallData,
     })
-    
+
     await checkTxCompleted(mintTx)
     setSuccessful(true);
+    onDeposit(true);
   }
 
   return (
@@ -141,7 +141,7 @@ export default function BridgeTokenStep({ telegramUserId, signed }: BridgeTokenS
               <Label className="text-base">Network</Label>
               <Input type="text" className="font-bold" value="Linea Sepolia" readOnly />
             </div>
-            <Button className="text-sm max-w-32" onClick={depositUSDC} disabled={address===""}>Deposit</Button>
+            <Button className="text-sm max-w-32" onClick={depositUSDC} disabled={address === ""}>Deposit</Button>
           </div>
         </div>
       </div>

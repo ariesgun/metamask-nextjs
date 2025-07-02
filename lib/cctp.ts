@@ -1,10 +1,7 @@
 import { Address, encodeFunctionData, erc20Abi, Hex } from "viem";
-import { waitForTransactionReceipt } from "viem/actions";
 import { CHAIN_IDS_TO_MESSAGE_TRANSMITTER, DESTINATION_DOMAINS } from "./constants";
 
 export const encodeCCTPDepositForBurn = (destinationAddress: Address, assetAddress: Address, destinationChainId: number, amount: bigint) => {
-  let supplyHookData: Hex = "0x0000000000000000000000000000000000000000000000000000000000000000";
-
   try {
     const finalityThreshold = 1000;
     const maxFee = BigInt(30);
@@ -77,8 +74,6 @@ export const retrieveAttestation = async (sourceChainId: number, transactionHash
 };
 
 export const encodeCCTPMint = (destinationChainId: number, attestation: any) => {
-  const MAX_RETRIES = 3;
-  let retries = 0;
   console.log("Minting USDC...");
 
   try {

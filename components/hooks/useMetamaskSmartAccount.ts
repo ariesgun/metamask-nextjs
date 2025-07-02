@@ -8,7 +8,7 @@ import {
 } from "@metamask/delegation-toolkit";
 import { useEffect, useState } from "react";
 import { Address, Hex } from "viem";
-import { useAccount, usePublicClient, useSignMessage, useSignTypedData, useWalletClient } from "wagmi";
+import { useAccount, usePublicClient, useWalletClient } from "wagmi";
 import { baseSepolia } from "viem/chains";
 
 export default function useMetamaskSmartAccount(): {
@@ -24,25 +24,8 @@ export default function useMetamaskSmartAccount(): {
     null
   );
 
-  
-  const { signMessageAsync } = useSignMessage();
-  const { signTypedDataAsync } = useSignTypedData();
-
   useEffect(() => {
-    console.log("Metamask... ", walletClient?.chain.id)
     if (!address || !walletClient || !publicClient) return;
-
-    // console.log("Creating smart account", walletClient);
-    const connectedAccount = {
-      address,
-      type: 'json-rpc' as const,
-      async signMessage({ message }: { message: any }) {
-        return await signMessageAsync({ message });
-      },
-      async signTypedData(typedData: any) {
-        return await signTypedDataAsync(typedData);
-      },
-    };
 
     toMetaMaskSmartAccount({
       client: publicClient,

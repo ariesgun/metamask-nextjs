@@ -1,19 +1,16 @@
-import { useAccount, useConnect, useSignMessage } from "wagmi";
-import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
-import { formatAddress } from "@/lib/utils";
-import { useState } from "react";
-import { Input } from "./ui/input";
 
-export default function FinalStep() {
+interface FinalStepProps {
+  done: boolean;
+}
 
-  const [signature, setSignature] = useState<string | null>(null)
+export default function FinalStep({ done }: FinalStepProps) {
 
   return (
     <>
       <div className="flex gap-x-6">
         <div
-          className={`w-10 h-10 rounded-full flex items-center justify-center text-white text-lg font-bold mt-2 ${signature ? "bg-green-500" : "bg-gray-400"
+          className={`w-10 h-10 rounded-full flex items-center justify-center text-white text-lg font-bold mt-2 ${done ? "bg-green-500" : "bg-gray-400"
             }`}
         >4</div>
         <div className="flex flex-col gap-2">

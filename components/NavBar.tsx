@@ -13,7 +13,6 @@ import { useAccount, useConnect, useDisconnect } from 'wagmi';
 import { Separator } from "@/components/ui/separator";
 
 export const ConnectWalletButton = () => {
-  // const { sdk, connected, connecting, account } = useSDK();
   const { isConnected, address, isConnecting } = useAccount();
   const { connectors, connect } = useConnect()
   const { disconnect } = useDisconnect();
@@ -57,18 +56,6 @@ export const ConnectWalletButton = () => {
 };
 
 export const NavBar = () => {
-  const host =
-    typeof window !== "undefined" ? window.location.host : "defaultHost";
-
-  const sdkOptions = {
-    logging: { developerMode: false },
-    checkInstallationImmediately: false,
-    dappMetadata: {
-      name: "Next-Metamask-Boilerplate",
-      url: host, // using the host constant defined above
-    },
-  };
-
   return (
     <nav className="flex flex-col items-center justify-between max-w-screen-xl px-6 mx-auto py-3 rounded-xl w-full">
       <div className="flex items-center justify-between max-w-screen-xl mx-auto px-6 py-7 rounded-xl w-full">

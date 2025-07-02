@@ -9,8 +9,6 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "@circle-fin/developer-controlled-wallets": "^8.3.0",
-    "@metamask/delegation-toolkit": "^0.11.0",
     "@metamask/sdk": "^0.33.0",
     "@radix-ui/react-accordion": "^1.2.11",
     "@radix-ui/react-label": "^2.1.7",

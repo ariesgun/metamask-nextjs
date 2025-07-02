@@ -3,7 +3,7 @@
 import type { ReactNode } from 'react';
 import { createConfig, http, WagmiProvider } from 'wagmi';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { baseSepolia, linea, lineaSepolia } from "wagmi/chains";
+import { baseSepolia, lineaSepolia } from "wagmi/chains";
 import { metaMask } from "wagmi/connectors";
 
 const client = new QueryClient();
