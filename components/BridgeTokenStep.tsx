@@ -87,7 +87,7 @@ export default function BridgeTokenStep({ telegramUserName, signed, onDeposit }:
     await checkTxCompleted(approveTx)
 
     // DepositForBurn on Linea
-    const depositForBurnCallData = encodeCCTPDepositForBurn(walletClient?.account.address as Hex, usdc, baseSepolia.id, tokenAmount)
+    const depositForBurnCallData = encodeCCTPDepositForBurn(address as Hex, usdc, baseSepolia.id, tokenAmount)
     const depositTx = await sendTransaction(config, {
       to: spender,
       data: depositForBurnCallData,
@@ -116,6 +116,17 @@ export default function BridgeTokenStep({ telegramUserName, signed, onDeposit }:
     await checkTxCompleted(mintTx)
     setSuccessful(true);
     onDeposit(true);
+
+    await fetch('/api/wallet-deposit', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        address: address, // or any payload your API expects
+      }),
+    });
+
   }
 
   return (
